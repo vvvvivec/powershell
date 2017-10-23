@@ -1,7 +1,16 @@
 ﻿# dispy.ps1 
+# 
+# Author: Brian D. 
+# Date: 10/23/17
 #
 # This script takes in an AD Group and a display name to update it to
 # It outputs the existing display name, then the updated display name
+# 
+# PARAMETERS: 
+# <adgroup> : AD Group to update display name for 
+# <dispname> : Provided Display Name to uise for update
+# 
+# Use "help" or "-h" as first argument to show help message
 
 #define parameters
 param (
@@ -9,6 +18,7 @@ param (
     [string]$dispname
  )
 
+# If adgroup argument is help command , display the help message and exit the script
 if ($adgroup -like "help" -Or "-h")
 {
     Write-Host "Script usage: .\dispy.ps1 <ADGROUP> <DISPLAYNAME>"
