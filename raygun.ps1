@@ -25,7 +25,7 @@ param (
 )
 
 # Set path for psexec.exe 
-$targetPath = "\\Kandor\DSL\SA\Utils\psexec.exe"
+$targetPath = "psexec.exe"
 
 # Display provided arguments
 # If computer is provided , output it , otherwise don't
@@ -97,7 +97,7 @@ if (($command -like "scorch") -and ($computer))
         # It must be done this way in order for single and double quotes (',") to be interpreted correctly
         # Otherwise the command will not successfully execute
         $remoteTarget = "\\$computer -c -f -s " 
-        $batPath = "\\Kandor\DSL\SA\Utils\cleartemp.bat"
+        $batPath = "cleartemp.bat"
         $remoteComplete = $remoteTarget+$batPath
 
         # Echo the provided command
