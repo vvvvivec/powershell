@@ -4,7 +4,7 @@
 #
 #    Author: Brian D.
 #    Date: 110117
-#    Version 0001
+#    Version 0002
 #
 #    Description: 
 #    This script executes SEP scans on remote machines and pulls SEP logs for ITSecurity documentation purposes.
@@ -12,9 +12,10 @@
 #    Use:   .\raygun.ps1 <$command> <$compname>
 #
 #    $command : scan , fetch , help
-#         scan  - Start an SEP scan on the designated remote machine
-#         fetch - Fetch scan result logs from most recent SEP log entries
-#         help  - Display help message
+#         scan   - Start an SEP scan on the designated remote machine
+#         fetch  - Fetch scan result logs from most recent SEP log entries
+#         scorch - Calls cleartemp.bat , nukes temp data from machine
+#         help   - Display help message
 #    $compname : name of computer to scan 
 
 # Define Parameters
@@ -24,7 +25,7 @@ param (
 )
 
 # Set path for psexec.exe 
-$targetPath = "\\Kandor\DSL\SA\psexec.exe"
+$targetPath = "\\Kandor\DSL\SA\Utils\psexec.exe"
 
 # Display provided arguments
 # If computer is provided , output it , otherwise don't
@@ -86,6 +87,32 @@ if (($command -like 'fetch') -and ($computer))
     }
 }
 
+# If $command == scorch , run cleartemp bat
+if (($command -like "scorch") -and ($computer))
+{
+    # Try to execute the remote command
+    Try
+    {
+        # Assemble the psexec command string
+        # It must be done this way in order for single and double quotes (',") to be interpreted correctly
+        # Otherwise the command will not successfully execute
+        $remoteTarget = "\\$computer -c -f -s " 
+        $batPath = "\\Kandor\DSL\SA\Utils\cleartemp.bat"
+        $remoteComplete = $remoteTarget+$batPath
+
+        # Echo the provided command
+        Write-Host "`nExecuting the following command on provided target: $remoteComplete"
+
+        # Start the psexec process and wait for the scan to start before exiting psexec 
+        Start-Process -FilePath "$targetPath" -ArgumentList "$remoteComplete" -PassThru -Wait 
+    }
+    # Catch Exceptions and display error message
+    Catch
+    {
+       Write-Host $errorMessage
+    }
+}
+
 # If $command == help , display help message
 if (($command -like 'help') -or ($command -like ''))
 {
@@ -94,6 +121,7 @@ if (($command -like 'help') -or ($command -like ''))
     Write-Host "Valid commands: scan , fetch, help"
     Write-Host "Scan - Start full SEP scan on targeted computer"
     Write-Host "Fetch - Get 10 most recent SEP logs and filter for scan result events only"
+    Write-Host "Scorch - Runs script to clear temp data from machine"
     Write-Host "Help - Display this message"
     Write-Host "Example input: .\raygun.ps1 scan myPC"
 }
